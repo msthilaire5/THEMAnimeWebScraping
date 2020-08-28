@@ -1,0 +1,2 @@
+class MissingAnimeDetailError(Exception):
+    pass
