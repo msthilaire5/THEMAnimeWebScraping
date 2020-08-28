@@ -8,6 +8,18 @@ def _not_second_opinion(elem_txt):
     return str(elem_txt).lower() != "second opinion"
 
 
+def _is_aka_tag(tag):
+    return tag.name == "td" and "AKA" in str(tag)
+
+
+def _is_genre_tag(tag):
+    return tag.name == "td" and "Genre" in str(tag)
+
+
+def _is_content_rating_tag(tag):
+    return tag.name == "td" and "Content Rating" in str(tag)
+
+
 def get_review_links(list_url):
     response = requests.get(list_url)
     response.raise_for_status()
@@ -20,7 +32,7 @@ def get_review_links(list_url):
     return review_links
 
 
-def get_anime_title(review_url):
+def get_title(review_url):
     response = requests.get(review_url)
     response.raise_for_status()
 
@@ -32,11 +44,7 @@ def get_anime_title(review_url):
     return title
 
 
-def _is_aka_tag(tag):
-    return tag.name == "td" and "AKA" in str(tag)
-
-
-def get_anime_AKA(review_url):
+def get_AKA(review_url):
     response = requests.get(review_url)
     response.raise_for_status()
 
@@ -47,3 +55,33 @@ def get_anime_AKA(review_url):
     except AttributeError:
         raise MissingAnimeDetailError("This anime's review is missing alternative names.")
     return aka
+
+
+def get_genre(review_url):
+    response = requests.get(review_url)
+    response.raise_for_status()
+
+    review_page_soup = BeautifulSoup(response.text, "html.parser")
+    try:
+        genre_tag = review_page_soup.find(class_="review").find(_is_genre_tag)
+        genre = genre_tag.text[len("Genre: "):]
+    except AttributeError:
+        raise MissingAnimeDetailError("This anime's review is missing its genre.")
+    return genre
+
+
+def get_content_rating(review_url):
+    response = requests.get(review_url)
+    response.raise_for_status()
+
+    review_page_soup = BeautifulSoup(response.text, "html.parser")
+    try:
+        content_rating_tag = review_page_soup.find(class_="review").find(_is_content_rating_tag)
+        content_rating = content_rating_tag.text[len("Content Rating: "):]
+        if "(" in content_rating:
+            explanation_start = content_rating.find("(")
+            content_rating = content_rating[:explanation_start]
+        content_rating = content_rating.strip()
+    except AttributeError:
+        raise MissingAnimeDetailError("This anime's review is missing its content rating.")
+    return content_rating
