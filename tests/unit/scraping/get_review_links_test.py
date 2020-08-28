@@ -1,13 +1,12 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from bs4 import BeautifulSoup
 from scraping.populate_review_db import get_review_links
 
 
-class populate_review_db_TestCase(unittest.TestCase):
+class get_review_links_TestCase(unittest.TestCase):
 
     @patch('requests.get')
-    def test_get_review_links(self, mock_get):
+    def test_a_reviews(self, mock_get):
         a_list_link = "tests/example_pages/a_reviews.html"
         a_reviews = open(a_list_link, "r")
         mock_get.return_value = MagicMock()
@@ -30,6 +29,18 @@ class populate_review_db_TestCase(unittest.TestCase):
         ]
         self.assertCountEqual(rev_links, expected)
         mock_get.assert_called_with(a_list_link)
+
+    @patch('requests.get')
+    def test_no_reviews(self, mock_get):
+        no_reviews_link = "tests/example_pages/no_reviews.html"
+        no_reviews = open(no_reviews_link, "r")
+        mock_get.return_value = MagicMock()
+        mock_get.return_value.text = no_reviews
+
+        rev_links = get_review_links(no_reviews_link)
+        expected = []
+        self.assertCountEqual(rev_links, expected)
+        mock_get.assert_called_with(no_reviews_link)
 
 
 if __name__ == '__main__':
