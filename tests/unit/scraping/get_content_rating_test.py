@@ -19,6 +19,18 @@ class get_content_rating_TestCase(unittest.TestCase):
         mock_get.assert_called_with(review_link)
 
     @patch('requests.get')
+    def test_rating_with_no_explanation(self, mock_get):
+        review_link = "tests/example_pages/no_cr_explanation.html"
+        review_page = open(review_link, "r")
+        mock_get.return_value = MagicMock()
+        mock_get.return_value.text = review_page
+
+        rating = get_content_rating(review_link)
+        expected = "PG"
+        self.assertEqual(expected, rating)
+        mock_get.assert_called_with(review_link)
+
+    @patch('requests.get')
     def test_rating_missing(self, mock_get):
         review_link = "tests/example_pages/no_content_rating.html"
         review_page = open(review_link, "r")
