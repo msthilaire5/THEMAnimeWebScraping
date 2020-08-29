@@ -8,18 +8,6 @@ def _not_second_opinion(elem_txt):
     return str(elem_txt).lower() != "second opinion"
 
 
-def _is_aka_tag(tag):
-    return tag.name == "td" and "AKA" in str(tag)
-
-
-def _is_genre_tag(tag):
-    return tag.name == "td" and "Genre" in str(tag)
-
-
-def _is_content_rating_tag(tag):
-    return tag.name == "td" and "Content Rating" in str(tag)
-
-
 def get_review_links(list_url):
     response = requests.get(list_url)
     response.raise_for_status()
@@ -85,3 +73,20 @@ def get_content_rating(review_url):
     except AttributeError:
         raise MissingAnimeDetailError("This anime's review is missing its content rating.")
     return content_rating
+
+
+def get_length_info(review_url):
+    response = requests.get(review_url)
+    response.raise_for_status()
+
+    review_page_soup = BeautifulSoup(response.text, "html.parser")
+    try:
+        length_tag = review_page_soup.find('b', text=re.compile("Length"))
+        length_details = length_tag.next_sibling.split(",")
+        media_type = length_details[0].strip()
+        num_episodes = 1 if len(length_details) < 3 else int(length_details[1].split()[0])
+        mins_per_episode = int(length_details[-1].split()[0])
+        length_info = (media_type, num_episodes, mins_per_episode)
+    except AttributeError:
+        raise MissingAnimeDetailError("This anime's review is missing its content rating.")
+    return length_info
