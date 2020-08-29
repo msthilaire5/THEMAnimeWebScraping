@@ -7,7 +7,7 @@ from scraping.MissingAnimeDetailError import MissingAnimeDetailError
 class get_length_info_TestCase(unittest.TestCase):
 
     @patch('requests.get')
-    def test_not_movie(self, mock_get):
+    def test_series(self, mock_get):
         review_link = "tests/example_pages/review685.html"
         review_page = open(review_link, "r")
         mock_get.return_value = MagicMock()

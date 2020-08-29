@@ -1,4 +1,5 @@
 import re
+import string
 import requests
 from bs4 import BeautifulSoup
 from scraping.MissingAnimeDetailError import MissingAnimeDetailError
@@ -88,5 +89,26 @@ def get_length_info(review_url):
         mins_per_episode = int(length_details[-1].split()[0])
         length_info = (media_type, num_episodes, mins_per_episode)
     except AttributeError:
-        raise MissingAnimeDetailError("This anime's review is missing its content rating.")
+        raise MissingAnimeDetailError("This anime's review is missing its length information.")
     return length_info
+
+
+def get_distributor(review_url):
+    response = requests.get(review_url)
+    response.raise_for_status()
+
+    review_page_soup = BeautifulSoup(response.text, "html.parser")
+    try:
+        distributor_tag = review_page_soup.find('b', text=re.compile("Distributor"))
+        distributor_link = distributor_tag.find_next_sibling('a')
+        if distributor_link:
+            distributor = distributor_link.string
+        else:
+            distributor_details = distributor_tag.next_sibling
+            by_location = distributor_details.find("by")
+            distributor_start = by_location + len("by ")
+            DELIMETERS = "[{}]".format(string.punctuation)
+            distributor = re.split(DELIMETERS, distributor_details[distributor_start:])[0]
+    except AttributeError:
+        raise MissingAnimeDetailError("This anime's review is missing its distributor.")
+    return distributor
