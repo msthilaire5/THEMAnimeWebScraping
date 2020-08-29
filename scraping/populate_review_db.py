@@ -27,7 +27,7 @@ def get_review_links(list_url):
     list_page_soup = BeautifulSoup(response.text, "html.parser")
     list_soup = list_page_soup.find(class_="content")
     rev_link_elems = list_soup.find_all(href=re.compile("viewreview.php"),
-                                       string=_not_second_opinion)
+                                        string=_not_second_opinion)
     review_links = [rev_link.get('href') for rev_link in rev_link_elems]
     return review_links
 
@@ -50,8 +50,8 @@ def get_AKA(review_url):
 
     review_page_soup = BeautifulSoup(response.text, "html.parser")
     try:
-        aka_tag = review_page_soup.find(class_="review").find(_is_aka_tag)
-        aka = aka_tag.text[len("AKA: "):]
+        aka_tag = review_page_soup.find('b', text=re.compile("AKA"))
+        aka = aka_tag.next_sibling.strip()
     except AttributeError:
         raise MissingAnimeDetailError("This anime's review is missing alternative names.")
     return aka
@@ -63,8 +63,8 @@ def get_genre(review_url):
 
     review_page_soup = BeautifulSoup(response.text, "html.parser")
     try:
-        genre_tag = review_page_soup.find(class_="review").find(_is_genre_tag)
-        genre = genre_tag.text[len("Genre: "):]
+        genre_tag = review_page_soup.find('b', text=re.compile("Genre"))
+        genre = genre_tag.next_sibling.strip()
     except AttributeError:
         raise MissingAnimeDetailError("This anime's review is missing its genre.")
     return genre
@@ -76,8 +76,8 @@ def get_content_rating(review_url):
 
     review_page_soup = BeautifulSoup(response.text, "html.parser")
     try:
-        content_rating_tag = review_page_soup.find(class_="review").find(_is_content_rating_tag)
-        content_rating = content_rating_tag.text[len("Content Rating: "):]
+        content_rating_tag = review_page_soup.find('b', text=re.compile("Content Rating"))
+        content_rating = content_rating_tag.next_sibling
         if "(" in content_rating:
             explanation_start = content_rating.find("(")
             content_rating = content_rating[:explanation_start]
