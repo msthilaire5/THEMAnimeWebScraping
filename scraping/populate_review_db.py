@@ -33,7 +33,7 @@ def get_title(review_url):
     return title
 
 
-def get_AKA(review_url):
+def get_aka(review_url):
     response = requests.get(review_url)
     response.raise_for_status()
 

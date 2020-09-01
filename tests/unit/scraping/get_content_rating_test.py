@@ -20,7 +20,7 @@ class get_content_rating_TestCase(unittest.TestCase):
 
     @patch('requests.get')
     def test_rating_with_no_explanation(self, mock_get):
-        review_link = "tests/example_pages/no_cr_explanation.html"
+        review_link = "tests/example_pages/review1.html"
         review_page = open(review_link, "r")
         mock_get.return_value = MagicMock()
         mock_get.return_value.text = review_page
