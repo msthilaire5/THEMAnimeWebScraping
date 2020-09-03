@@ -87,6 +87,66 @@ class Anime_to_dict_TestCase(unittest.TestCase):
         }
         self.assertDictEqual(anime.to_dict(), expected)
 
+    def test_duration_range_no_distributor_link(self):
+        review_link = "tests/example_pages/review1121.html"
+        review_html = open(review_link, "r")
+        review_soup = BeautifulSoup(review_html, "html.parser")
+        anime = Anime("=1121", review_soup)
+
+        expected = {
+            'id': 1121,
+            'title': "3x3 Eyes 1&2",
+            'aka': "サザンアイ (Sazan Eyes)",
+            'genre': "Supernatural horror",
+            'mediaType': "OAV series",
+            'numEpisodes': 7,
+            'minsPerEpisode': 30,
+            'distributor': "Pioneer",
+            'contentRating': "16+",
+            'revURL': "=1121"
+        }
+        self.assertDictEqual(anime.to_dict(), expected)
+
+    def test_streaming_distributor_no_link(self):
+        review_link = "tests/example_pages/review1924.html"
+        review_html = open(review_link, "r")
+        review_soup = BeautifulSoup(review_html, "html.parser")
+        anime = Anime("=1924", review_soup)
+
+        expected = {
+            'id': 1924,
+            'title': "Abunai Sisters: Koko & Mika",
+            'aka': "N/A",
+            'genre': "Action comedy",
+            'mediaType': "Television series",
+            'numEpisodes': 10,
+            'minsPerEpisode': 3,
+            'distributor': "Crunchyroll",
+            'contentRating': "16+",
+            'revURL': "=1924"
+        }
+        self.assertDictEqual(anime.to_dict(), expected)
+
+    def test_about_duration(self):
+        review_link = "tests/example_pages/review1717.html"
+        review_html = open(review_link, "r")
+        review_soup = BeautifulSoup(review_html, "html.parser")
+        anime = Anime("=1717", review_soup)
+
+        expected = {
+            'id': 1717,
+            'title': "After School of the Earth",
+            'aka': "地球の放課後 (Chikyuu no Houkago)",
+            'genre': "Sci-Fi (With Some Harem Touches)",
+            'mediaType': "Television series",
+            'numEpisodes': 9,
+            'minsPerEpisode': 11,
+            'distributor': "unlicensed",
+            'contentRating': "PG-13",
+            'revURL': "=1717"
+        }
+        self.assertDictEqual(anime.to_dict(), expected)
+
     def test_title_missing(self):
         review_link = "tests/example_pages/no_title.html"
         review_html = open(review_link, "r")

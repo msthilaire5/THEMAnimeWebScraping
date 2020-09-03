@@ -59,7 +59,14 @@ class Anime:
             length_details = length_tag.next_sibling.split(",")
             self.media_type = length_details[0].strip()
             self.num_episodes = 1 if len(length_details) < 3 else int(length_details[1].split()[0])
-            self.mins_per_episode = int(length_details[-1].split()[0])
+            ep_length_details = length_details[-1].split()
+            if ep_length_details[0].isnumeric():
+                mins_per_episode = int(ep_length_details[0])
+            elif "-" in ep_length_details[0]:
+                mins_per_episode = int(ep_length_details[0].split("-")[0])
+            else:
+                mins_per_episode = int(ep_length_details[1])
+            self.mins_per_episode = mins_per_episode
         except AttributeError:
             raise MissingAnimeDetailError("This anime's review is missing its length information.")
 
@@ -71,10 +78,16 @@ class Anime:
             else:
                 distributor_details = distributor_tag.next_sibling
                 by_location = distributor_details.find("by")
-                distributor_start = by_location + len("by ")
+                from_location = distributor_details.find("from")
+                on_location = distributor_details.find("on")
+                if by_location > -1:
+                    distributor_start = by_location + len("by ")
+                elif from_location > -1:
+                    distributor_start = from_location + len("from ")
+                else:
+                    distributor_start = on_location + len("on ")
                 delimiters = "[{}]".format(string.punctuation)
-                distributor = re.split(delimiters, distributor_details[distributor_start:])[0]
-                self.distributor = distributor
+                self.distributor = re.split(delimiters, distributor_details[distributor_start:])[0]
         except AttributeError:
             raise MissingAnimeDetailError("This anime's review is missing its distributor.")
 
